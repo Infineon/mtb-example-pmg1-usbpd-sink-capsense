@@ -4,7 +4,7 @@ This code example demonstrates USB Type-C attach detection and USB Power Deliver
 
 [View this README on GitHub.](https://github.com/Infineon/mtb-example-pmg1-usbpd-sink-capsense)
 
-[Provide feedback on this code example.](https://cypress.co1.qualtrics.com/jfe/form/SV_1NTns53sK2yiljn?Q_EED=eyJVbmlxdWUgRG9jIElkIjoiQ0UyMzM2NDUiLCJTcGVjIE51bWJlciI6IjAwMi0zMzY0NSIsIkRvYyBUaXRsZSI6IkVaLVBEJnRyYWRlOyBQTUcxIE1DVTogVVNCUEQgc2luayBDQVBTRU5TRSZ0cmFkZTsiLCJyaWQiOiJhdHJyIiwiRG9jIHZlcnNpb24iOiIxLjAuMCIsIkRvYyBMYW5ndWFnZSI6IkVuZ2xpc2giLCJEb2MgRGl2aXNpb24iOiJNQ0QiLCJEb2MgQlUiOiJXSVJFRCIsIkRvYyBGYW1pbHkiOiJUWVBFLUMgVVNCIn0=)
+[Provide feedback on this code example.](https://cypress.co1.qualtrics.com/jfe/form/SV_1NTns53sK2yiljn?Q_EED=eyJVbmlxdWUgRG9jIElkIjoiQ0UyMzM2NDUiLCJTcGVjIE51bWJlciI6IjAwMi0zMzY0NSIsIkRvYyBUaXRsZSI6IkVaLVBEJnRyYWRlOyBQTUcxIE1DVTogVVNCUEQgc2luayBDQVBTRU5TRSZ0cmFkZTsiLCJyaWQiOiJhdHJyIiwiRG9jIHZlcnNpb24iOiIxLjEuMCIsIkRvYyBMYW5ndWFnZSI6IkVuZ2xpc2giLCJEb2MgRGl2aXNpb24iOiJNQ0QiLCJEb2MgQlUiOiJXSVJFRCIsIkRvYyBGYW1pbHkiOiJUWVBFLUMgVVNCIn0=)
 
 ## Requirements
 
@@ -388,6 +388,7 @@ Document Title: *CE233645* - *EZ-PD&trade; PMG1 MCU: USBPD sink CAPSENSE&trade;*
 | Version | Description of change |
 | ------- | --------------------- |
 | 1.0.0   | New code example      |
+| 1.1.0   | Capsense LED response fix |
 ------
 
 All other trademarks or registered trademarks referenced herein are the property of their respective owners.

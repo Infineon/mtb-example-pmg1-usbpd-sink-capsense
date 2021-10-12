@@ -519,15 +519,15 @@ static void process_touch(void)
     {
         position = ptrSliderPosition->ptrPosition->x;
         Cy_GPIO_Write(CYBSP_LED_SLD0_PORT, CYBSP_LED_SLD0_PIN,
-                (position < ( 1 * STEP_SIZE)) ? LED_ON : LED_OFF);
+                (position <= ( 1 * STEP_SIZE)) ? LED_ON : LED_OFF);
         Cy_GPIO_Write(CYBSP_LED_SLD1_PORT, CYBSP_LED_SLD1_PIN,
-                (((position > ( 1 * STEP_SIZE))) && ((position < ( 2 * STEP_SIZE)))) ? LED_ON : LED_OFF);
+                (((position > ( 1 * STEP_SIZE))) && ((position <= ( 2 * STEP_SIZE)))) ? LED_ON : LED_OFF);
         Cy_GPIO_Write(CYBSP_LED_SLD2_PORT, CYBSP_LED_SLD2_PIN,
-                (((position > ( 2 * STEP_SIZE))) && ((position < ( 3 * STEP_SIZE)))) ? LED_ON : LED_OFF);
+                (((position > ( 2 * STEP_SIZE))) && ((position <= ( 3 * STEP_SIZE)))) ? LED_ON : LED_OFF);
         Cy_GPIO_Write(CYBSP_LED_SLD3_PORT, CYBSP_LED_SLD3_PIN,
-                (((position > ( 3 * STEP_SIZE))) && ((position < ( 4 * STEP_SIZE)))) ? LED_ON : LED_OFF);
+                (((position > ( 3 * STEP_SIZE))) && ((position <= ( 4 * STEP_SIZE)))) ? LED_ON : LED_OFF);
         Cy_GPIO_Write(CYBSP_LED_SLD4_PORT, CYBSP_LED_SLD4_PIN,
-                (((position > ( 4 * STEP_SIZE))) && ((position < ( 5 * STEP_SIZE)))) ? LED_ON : LED_OFF);
+                (((position > ( 4 * STEP_SIZE))) && ((position <= ( 5 * STEP_SIZE)))) ? LED_ON : LED_OFF);
 
         /* Set the flag to indicate touch was detected */
         touchDetected = 1u;
