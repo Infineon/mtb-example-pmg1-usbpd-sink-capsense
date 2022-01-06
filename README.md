@@ -4,15 +4,14 @@ This code example demonstrates USB Type-C attach detection and USB Power Deliver
 
 [View this README on GitHub.](https://github.com/Infineon/mtb-example-pmg1-usbpd-sink-capsense)
 
-[Provide feedback on this code example.](https://cypress.co1.qualtrics.com/jfe/form/SV_1NTns53sK2yiljn?Q_EED=eyJVbmlxdWUgRG9jIElkIjoiQ0UyMzM2NDUiLCJTcGVjIE51bWJlciI6IjAwMi0zMzY0NSIsIkRvYyBUaXRsZSI6IkVaLVBEJnRyYWRlOyBQTUcxIE1DVTogVVNCUEQgc2luayBDQVBTRU5TRSZ0cmFkZTsiLCJyaWQiOiJhdHJyIiwiRG9jIHZlcnNpb24iOiIxLjEuMCIsIkRvYyBMYW5ndWFnZSI6IkVuZ2xpc2giLCJEb2MgRGl2aXNpb24iOiJNQ0QiLCJEb2MgQlUiOiJXSVJFRCIsIkRvYyBGYW1pbHkiOiJUWVBFLUMgVVNCIn0=)
+[Provide feedback on this code example.](https://cypress.co1.qualtrics.com/jfe/form/SV_1NTns53sK2yiljn?Q_EED=eyJVbmlxdWUgRG9jIElkIjoiQ0UyMzM2NDUiLCJTcGVjIE51bWJlciI6IjAwMi0zMzY0NSIsIkRvYyBUaXRsZSI6IkVaLVBEJnRyYWRlOyBQTUcxIE1DVTogVVNCUEQgc2luayBDQVBTRU5TRSZ0cmFkZTsiLCJyaWQiOiJwc2hyIiwiRG9jIHZlcnNpb24iOiIyLjAuMCIsIkRvYyBMYW5ndWFnZSI6IkVuZ2xpc2giLCJEb2MgRGl2aXNpb24iOiJNQ0QiLCJEb2MgQlUiOiJXSVJFRCIsIkRvYyBGYW1pbHkiOiJUWVBFLUMifQ==)
 
 ## Requirements
 
-- [ModusToolbox&trade; software](https://www.cypress.com/products/modustoolbox-software-environment) v2.3 or later (tested with v2.3)
-- Set the CY_SUPPORTED_KITS environment variable with the value of "PMG1" to enable support for the PMG1 parts and BSPs under ModusToolbox&trade; software
+- [ModusToolbox&trade; software](https://www.cypress.com/products/modustoolbox-software-environment) v2.4 or later (tested with v2.4)
 - Board support package (BSP) minimum required version: 1.2.0
 - Programming language: C
-- Associated parts: All [EZ-PD&trade; PMG1-S3](http://www.cypress.com/PMG1) parts
+- Associated parts: All [EZ-PD&trade; PMG1-S3](https://www.cypress.com/PMG1) parts
 
 ## Supported toolchains (make variable 'TOOLCHAIN')
 
@@ -22,15 +21,15 @@ This code example demonstrates USB Type-C attach detection and USB Power Deliver
 
 ## Supported kits (make variable 'TARGET')
 
-- [PMG1-S3 prototyping kit](https://www.cypress.com/CY7113) (`PMG1-CY7113`) - Default value of `TARGET`
+- [EZ-PD&trade; PMG1-S3 prototyping kit](https://www.cypress.com/CY7113) (`PMG1-CY7113`) - Default value of `TARGET`
 
 ## Hardware setup
 
-1. Connect the board to your PC using the USB cable through the KitProg3 USB connector. This cable is used for programming the PMG1 device. It is also used during debugging.
+1. Connect the board to your PC using the USB cable through the KitProg3 USB connector. This cable is used for programming the EZ-PD&trade; PMG1 device. It is also used during debugging.
 
-2. Connect the USBPD port to the USB-C power adapter or your PC using the USB Type-C cable. This cable is used for the USB power delivery source and it provides power to the user LED.
+2. Connect the USBPD port to the USB-C power adapter or your PC using the USB Type-C cable. This cable is used for the USB Power Delivery source and it provides power to the user LED.
 
-See the kit user guide for more details on configuring the board.
+See the kit user guide for details on configuring the board.
 
 
 ## Software setup
@@ -82,10 +81,10 @@ Argument | Description | Required/optional
 `--user-app-name`| Specify the name of the application if you prefer to have a name other than the example's default name | Optional
 
 
-The following example will clone the "[Hello World](https://github.com/Infineon/mtb-example-pmg1-hello-world)" application with the desired name "MyHelloWorld" configured for the *PMG1-CY7113* BSP into the specified working directory, *C:/mtb_projects*:
+The following example will clone the "[USBPD Sink CAPSENSE](https://github.com/Infineon/mtb-example-pmg1-usbpd-sink-capsense)" application with the desired name "MyUsbpdSinkCapSense" configured for the *PMG1-CY7113* BSP into the specified working directory, *C:/mtb_projects*:
 
    ```
-   project-creator-cli --board-id PMG1-CY7113 --app-id mtb-example-pmg1-hello-world --user-app-name MyHelloWorld --target-dir "C:/mtb_projects"
+   project-creator-cli --board-id PMG1-CY7113 --app-id mtb-example-pmg1-usbpd-sink-capsense --user-app-name MyUsbpdSinkCapSense --target-dir "C:/mtb_projects"
    ```
 
 **Note:** The project-creator-cli tool uses the `git clone` and `make getlibs` commands to fetch the repository and import the required libraries. For details, see the "Project creator tools" section of the [ModusToolbox&trade; software user guide](https://www.cypress.com/ModusToolboxUserGuide) (locally available at *{ModusToolbox&trade; software install directory}/docs_{version}/mtb_user_guide.pdf*).
@@ -120,6 +119,7 @@ For a list of supported IDEs and more details, see the "Exporting to IDEs" secti
 
 </details>
 
+
 ## Operation
 
 1. Ensure that the steps listed in the [Hardware setup](#hardware-setup) section are completed.
@@ -150,7 +150,7 @@ For a list of supported IDEs and more details, see the "Exporting to IDEs" secti
 
 4. After programming the kit, change the position on power selection jumper (J5) to 1-2 to power the kit through the USBPD port. Don't change the jumper (J5) position while the cables are connected to power source.
 
-5. The User LED (LED3) on the board will blink at different rates depending on the type of power adapter connected:
+5. The user LED (LED3) on the board will blink at different rates depending on the type of power adapter connected:
 
    - If a power adapter supporting USB Power Delivery is connected, the LED blinks at about 5 Hz (toggles every 100 ms).
 
@@ -184,7 +184,7 @@ For more details, see the "Program and debug" section in the [Eclipse IDE for Mo
 
 ## Design and implementation
 
-PMG1 MCU devices support a USBPD block which integrates Type-C terminations, comparators, and the Power Delivery transceiver required to detect the attachment of a partner device and negotiate power contracts with it.
+EZ-PD&trade; PMG1 MCU devices support a USBPD block which integrates Type-C terminations, comparators, and the power delivery transceiver required to detect the attachment of a partner device and negotiate power contracts with it.
 
 On reset, the USBPD block is initialized with the following settings:
 
@@ -196,7 +196,7 @@ On reset, the USBPD block is initialized with the following settings:
 
    - The SAR ADC in the USBPD block is configured to measure the VBUS_TYPE-C voltage through an internal divider.
 
-This application uses the PDStack middleware library in an upstream facing port (UFP) - sink configuration. PMG1 MCU devices have a dead-battery Rd termination, which ensures that a USB-C source/charger connected to it can detect the presence of a sink even when the PMG1 MCU device is not powered.
+This application uses the PDStack middleware library in an upstream facing port (UFP) - sink configuration. EZ-PD&trade; PMG1 MCU devices have a dead-battery Rd termination, which ensures that a USB-C source/charger connected to it can detect the presence of a sink even when the EZ-PD&trade; PMG1 MCU device is not powered.
 
 The CAPSENSE&trade; middleware library is used to initialize the CSD block, perform widget scan and it's processing.
 
@@ -205,7 +205,7 @@ The CAPSENSE&trade; middleware library is used to initialize the CSD block, perf
 <img src = "images/fwflow.png" width = "300"/>
 <br>
 
-The PDStack middleware library configures the USBPD block on the PMG1 MCU device to detect Type-C connection state changes and USBPD messages, and notify the stack through callback functions. The callback function registers the pending tasks, which are then handled by PDStack through the `Cy_PdStack_Dpm_Task` function. This function is expected to be called at appropriate times from the main processing loop of the application.
+The PDStack middleware library configures the USBPD block on the EZ-PD&trade; PMG1 MCU device to detect Type-C connection state changes and USBPD messages, and notify the stack through callback functions. The callback function registers the pending tasks, which are then handled by PDStack through the `Cy_PdStack_Dpm_Task` function. This function is expected to be called at appropriate times from the main processing loop of the application.
 
 **Figure 2. PDStack task flowchart**
 
@@ -247,21 +247,23 @@ The stack also provides notification of various connection and PD policy state c
 
 The BC 1.2 sink state machine is activated only when the power source connected does not support USB Power Delivery. The GPIO connected to LED3 on the board is toggled at different rates to indicate the type of power source, which is detected by the PDStack library and the BC 1.2 sink state machine.
 
-The application tries to keep the PMG1 MCU device in deep sleep, where all clocks are disabled and only limited hardware blocks are enabled, for most of its working time. Interrupts in the USBPD block are configured to detect any changes that happen while the device is in sleep, and wake it up for further processing.
+The application initiates an Extended power range (EPR) mode entry request after a SPR contract is established if the source is EPR capable. If the EPR mode entry is successful, the EPR sink maintains a regular communication with the EPR source to allow EPR mode to continue.
+
+The application tries to keep the EZ-PD&trade; PMG1 MCU device in deep sleep, where all clocks are disabled and only limited hardware blocks are enabled, for most of its working time. Interrupts in the USBPD block are configured to detect any changes that happen while the device is in sleep, and wake it up for further processing.
 
 An overvoltage (OV) comparator in the USBPD block is used to detect cases where the power source is supplying incorrect voltage levels, and automatically shut down the power switches to protect the rest of the components on the board.
 
 ### Compile-time configurations
 
-The PMG1 MCU USBPD sink application functionality can be customized through a set of compile-time parameters that can be turned ON/OFF through the *config.h* header file.
+The PMG1 MCU USBPD sink application functionality can be customized through a set of compile-time parameters that can be turned ON/OFF through the *config.h* header or *Makefile* file.
 
 | Macro name          | Description                           | Allowed values |
 | :------------------ | :------------------------------------ | :------------- |
 | `CY_PD_SINK_ONLY`     | Specifies that the application supports only the USBPD sink (consumer) role | Should be set to 1u |
 | `NO_OF_TYPEC_PORTS`   | Specifies the number of USB-C ports supported | Should be set to 1u |
-| `CY_PD_REV3_ENABLE`   | Enable USBPD Revision 3.0 support | 1u or 0u |
+| `CY_PD_REV3_ENABLE`   | Enable USBPD Revision 3.1 support | 1u or 0u |
+| `CY_PD_EPR_ENABLE`    | Enable Extended Power Range (EPR) Sink support | 1u or 0u |
 | `PD_PDO_SEL_ALGO`     | Specifies the algorithm to be used while selecting the best source capability to power the board | 0u - Pick the source PDO delivering the maximum amount of power <br>1u - Pick the fixed source PDO delivering the maximum amount of power <br>2u - Pick the fixed source PDO delivering the maximum amount of current<br>3u - Pick the fixed source PDO delivering the maximum amount of voltage |
-| `VBUS_FET_CTRL`       | Selects the gate driver to be used to turn the consumer power path ON (applicable only for  CY7110) | 0u - Gate driver which does not support internal pull-up <br> 1u - Gate driver which supports pull-up for faster turn off |
 | `BATTERY_CHARGING_ENABLE` | Enables BC 1.2 (CDP/DCP) detection when connected to a non-USBPD power source | 1u or 0u |
 | `SNK_STANDBY_FET_SHUTDOWN_ENABLE` | Specifies whether the consumer power path should be disabled while PD contracts are being negotiated | 1u or 0u |
 | `SYS_DEEPSLEEP_ENABLE` | Enables device entry into deep sleep mode for power saving when the CPU is idle | 1u or 0u |
@@ -275,18 +277,22 @@ The USB Type-C connection manager, USB Power Delivery (USBPD) protocol layer, an
 
 Multiple variants of the PDStack library with different feature sets are provided; you can choose the appropriate version based on the features required by the target application.
 
-   - *PMG1_PD3_SNK_LITE*: Library with support for USB Type-C sink operation and USBPD Revision 3.0 messaging. This library is chosen by default.
+   - *PMG1_PD3_SNK_LITE:* Library with support for USB Type-C sink operation and USBPD Revision 3.1 messaging.
 
-   - *PMG1_PD2_SNK_LITE*: Library with support for USB Type-C sink operation and USBPD Revision 2.0 messaging. Using this library will reduce the flash (code) memory usage by the application.
+   - *PMG1_PD2_SNK_LITE:* Library with support for USB Type-C sink operation and USBPD Revision 2.0 messaging. Using this library will reduce the flash (code) memory usage by the application.
+   
+   - *PMG1_PD3_SNK_EPR:* Library with support for USB Type-C sink EPR operation and USBPD Revision 3.1 messaging. This library is chosen by default.
 
-The library of choice can be selected by editing the *Makefile* in the application folder and changing the value of the `COMPONENTS` variable. To use the PD Revision 2.0 library, replace the `PMG1_PD3_SNK_LITE` reference with `PMG1_PD2_SNK_LITE`.
+   - *PMG1_PD3_DRP:* Library with support for USB Type-C dual role operation and USBPD Revision 3.1 messaging.
+
+The library of choice can be selected by editing the *Makefile* in the application folder and changing the value of the `COMPONENTS` variable. To disable the EPR feature, set `CY_PD_EPR_ENABLE` to 0 in `DEFINES` in the *Makefile* and replace the `PMG1_PD3_SNK_EPR` reference with `PMG1_PD3_SNK_LITE`. To use the PD Revision 2.0 library, replace the reference with `PMG1_PD2_SNK_LITE`.
 
 
 ### USBPD port configuration
 
 The properties of the USB-C port including port role and the default response to various USBPD messages can be configured using the EZ-PD&trade; configurator utility.
 
-These parameters have been set to the appropriate values for a Power Delivery sink application by default. To view or change the configuration, click on the **EZ-PD&trade; Configurator 1.0** item under **Tools** in the Quick Panel to launch the configurator.
+These parameters have been set to the appropriate values for a Power Delivery sink application by default. To view or change the configuration, click on the **EZ-PD&trade; Configurator 1.10** item under **Tools** in the Quick Panel to launch the configurator.
 
 **Figure 3. USB Type-C port configuration using EZ-PD&trade;  Configurator**
 
@@ -314,19 +320,35 @@ The power capabilities supported by the application in the sink role are specifi
 
 The *SKEDB* section is used to input the extended sink capabilities response that will be sent by the application when queried by the power source. See the Power Delivery specification for details on the extended sink capabilities format.
 
+**Figure 6. Enabling extended power range (EPR) sink support using EZ-PD&trade; configurator**
+
+<img src = "images/ezpd-epr-sink-enable.png" width = "800"/>
+
+<br>
+
+The EPR support is enabled using the *EPR Configuration* section.
+
+**Figure 7. Extended power range (EPR) sink capability confugaration using EZ-PD&trade; configurator**
+
+<img src = "images/ezpd-epr-sink-pdo.png" width = "800"/>
+
+<br>
+
+The extended power range capabilities supported by the application in the sink role are specified using the *EPR Sink PDO* section. A maximum of six PDOs can be added using the configurator. And the maximum voltage supported is 28V.
+
 Once the parameters have been updated as desired, save the configuration and build the application.
 
-For quick verification of the application configurability, disable the **PD Operation** parameter under **Port Information**. When the PMG1 MCU device is programmed with this modification, you can see that the user LED blinks at a slower rate even when connected to a power source which supports USB Power Delivery.
+For quick verification of the application configurability, disable the **PD Operation** parameter under **Port Information**. When the EZ-PD&trade; PMG1 MCU device is programmed with this modification, you can see that the user LED blinks at a slower rate even when connected to a power source which supports USB Power Delivery.
 
 ### CAPSENSE&trade; Configuration
 
-In this project, PMG1-S3 MCU scans a self-capacitance (CSD) based 5-element CAPSENSE&trade; slider, and two CAPSENSE&trade; buttons for user input. The project uses the [CAPSENSE&trade; Middleware](https://github.com/cypresssemiconductorco/capsense) (see [ModusToolbox&trade; software user guide](http://www.cypress.com/ModusToolboxUserGuide) for more details on selecting a middleware). 
+In this project, EZ-PD&trade; PMG1-S3 MCU scans a self-capacitance (CSD) based 5-element CAPSENSE&trade; slider, and two CAPSENSE&trade; buttons for user input. The project uses the [CAPSENSE&trade; Middleware](https://github.com/Infineon/capsense) (see [ModusToolbox&trade; software user guide](http://www.cypress.com/ModusToolboxUserGuide) for more details on selecting a middleware). 
 
 See [AN85951 – PSoC&trade; 4 and PSoC&trade; 6 MCU CAPSENSE&trade; Design Guide](https://www.cypress.com/an85951) for more details on CAPSENSE&trade; features and usage. 
 
 In this application, the state of the LED is controlled based on user inputs provided using the CAPSENSE&trade; buttons and slider. Each sensor is mapped to an LED which turns ON when it is touched and turns OFF when the finger is removed. The LED mapping to the CAPSENSE&trade; sensor is provided in the operation section of this file. 
 
-The [ModusToolbox&trade; CAPSENSE&trade; Configurator Tool Guide](https://www.cypress.com/ModusToolboxCapSenseConfig) describes step-by-step instructions on how to configure CAPSENSE&trade; in the application. The CAPSENSE&trade; Configurator and Tuner tools can be launched from the CSD personality in the Device Configurator tool.
+The [ModusToolbox&trade; CAPSENSE&trade; Configurator tool guide](https://www.cypress.com/ModusToolboxCapSenseConfig) describes step-by-step instructions on how to configure CAPSENSE&trade; in the application. The CAPSENSE&trade; Configurator and Tuner tools can be launched from the CSD personality in the Device Configurator tool.
 
 ### Resources and settings
 
@@ -357,7 +379,7 @@ The [ModusToolbox&trade; CAPSENSE&trade; Configurator Tool Guide](https://www.cy
 | *src/app/pdo.c & .h*                | Defines function prototypes and implements functions to evaluate source capabilities (Power Data Object) |
 | *src/app/psink.c & .h*              | Defines function prototypes and implements functions for power consumer path control |
 | *src/app/swap.c & .h*               | Defines function prototypes and implements functions to evaluate the USBPD role swap requests |
-| *src/app/vdm.c & .h*                | Defines data structures, function prototypes and implements functions to handle Vendor Defined Messages (VDM) |
+| *src/app/vdm.c & .h*                | Defines data structures, function prototypes and implements functions to handle vendor defined messages (VDM) |
 | *src/system/instrumentation.c & .h* | Defines data structures, function prototypes and implements functions to monitor CPU resource usage |
 
 <br>
@@ -383,19 +405,15 @@ Cypress provides a wealth of data at www.cypress.com to help you select the righ
 
 ## Document history
 
-Document Title: *CE233645* - *EZ-PD&trade; PMG1 MCU: USBPD sink CAPSENSE&trade;*
+Document title: *CE233645* - *EZ-PD&trade; PMG1 MCU: USBPD sink CAPSENSE&trade;*
 
 | Version | Description of change |
 | ------- | --------------------- |
 | 1.0.0   | New code example      |
 | 1.1.0   | Capsense LED response fix |
+| 2.0.0   | Added EPR Feature |
 ------
 
-All other trademarks or registered trademarks referenced herein are the property of their respective owners.
-
-![banner](images/ifx-cy-banner.png)
-
--------------------------------------------------------------------------------
 
 © Cypress Semiconductor Corporation, 2021. This document is the property of Cypress Semiconductor Corporation, an Infineon Technologies company, and its affiliates (“Cypress”).  This document, including any software or firmware included or referenced in this document (“Software”), is owned by Cypress under the intellectual property laws and treaties of the United States and other countries worldwide.  Cypress reserves all rights under such laws and treaties and does not, except as specifically stated in this paragraph, grant any license under its patents, copyrights, trademarks, or other intellectual property rights.  If the Software is not accompanied by a license agreement and you do not otherwise have a written agreement with Cypress governing the use of the Software, then Cypress hereby grants you a personal, non-exclusive, nontransferable license (without the right to sublicense) (1) under its copyright rights in the Software (a) for Software provided in source code form, to modify and reproduce the Software solely for use with Cypress hardware products, only internally within your organization, and (b) to distribute the Software in binary code form externally to end users (either directly or indirectly through resellers and distributors), solely for use on Cypress hardware product units, and (2) under those claims of Cypress’s patents that are infringed by the Software (as provided by Cypress, unmodified) to make, use, distribute, and import the Software solely for use with Cypress hardware products.  Any other use, reproduction, modification, translation, or compilation of the Software is prohibited.
 <br>

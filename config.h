@@ -84,11 +84,11 @@
 /* Period in ms for turning off VBus FET. */
 #define APP_VBUS_FET_OFF_TIMER_PERIOD           (1u)
 
-/** 100: Timer used for providing delay for VBUS FET ON. */
-#define APP_VBUS_FET_ON_TIMER                   (100u)
+/** 103: Timer used for providing delay for VBUS FET ON. */
+#define APP_VBUS_FET_ON_TIMER                   (103u)
 
-/** 101: Timer used for providing delay for VBUS FET OFF. */
-#define APP_VBUS_FET_OFF_TIMER                  (101u)
+/** 104: Timer used for providing delay for VBUS FET OFF. */
+#define APP_VBUS_FET_OFF_TIMER                  (104u)
 
 /*
  * The Analog-MUX bus input which is used to measure VBus voltage. Choose AMUXBUS_A on PMG1-S2 and AMUXBUS_B on
@@ -211,6 +211,8 @@
 #define WATCHDOG_HARDWARE_RESET_ENABLE          (0u)
 #endif /* ((APP_FW_LED_ENABLE) || (RESET_ON_ERROR_ENABLE)) */
 
+#define EPR_SNK_ENTRY_TIMER                     (0xFB)
+#define EPR_SNK_ENTRY_TIMER_PERIOD              (100u)
 
 /*
  * Time interval(ms) for the Capsense widget scan.

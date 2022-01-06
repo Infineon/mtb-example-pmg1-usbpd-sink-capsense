@@ -85,7 +85,7 @@ cy_stc_pdstack_context_t gl_PdStackPort1Ctx;
 
 const cy_stc_pdstack_dpm_params_t pdstack_port0_dpm_params =
 {
-        .dpmSnkWaitCapPeriod = 400,
+        .dpmSnkWaitCapPeriod = 350,
         .dpmRpAudioAcc = CY_PD_RP_TERM_RP_CUR_DEF,
         .dpmDefCableCap = 300,
         .muxEnableDelayPeriod = 0,
@@ -96,7 +96,7 @@ const cy_stc_pdstack_dpm_params_t pdstack_port0_dpm_params =
 #if PMG1_PD_DUALPORT_ENABLE
 const cy_stc_pdstack_dpm_params_t pdstack_port1_dpm_params =
 {
-        .dpmSnkWaitCapPeriod = 400,
+        .dpmSnkWaitCapPeriod = 350,
         .dpmRpAudioAcc = CY_PD_RP_TERM_RP_CUR_DEF,
         .dpmDefCableCap = 300,
         .muxEnableDelayPeriod = 0,

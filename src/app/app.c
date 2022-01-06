@@ -234,6 +234,27 @@ bool app_extd_msg_handler(cy_stc_pdstack_context_t *ptrPdStackContext, cy_stc_pd
 
 static uint8_t gl_app_previous_polarity[NO_OF_TYPEC_PORTS];
 
+#if (CY_PD_EPR_ENABLE && (!CY_PD_SOURCE_ONLY))
+void epr_enter_mode_timer_cb (
+        cy_timer_id_t id,
+        void *ptrContext)
+{
+    (void)id;
+    cy_stc_pdstack_context_t *ptrPdStackContext = (cy_stc_pdstack_context_t *)ptrContext;
+
+    if (Cy_PdStack_Dpm_SendPdCommand (ptrPdStackContext, CY_PDSTACK_DPM_CMD_SNK_EPR_MODE_ENTRY, NULL, false, NULL) != CY_PDSTACK_STAT_SUCCESS)
+    {
+        /* Retry the EPR Entry. */
+        cy_sw_timer_start(ptrPdStackContext->ptrTimerContext, ptrPdStackContext,
+                EPR_SNK_ENTRY_TIMER, EPR_SNK_ENTRY_TIMER_PERIOD, epr_enter_mode_timer_cb);
+    }
+}
+#endif /* CY_PD_EPR_ENABLE && (!CY_PD_SOURCE_ONLY */
+
+#if (CY_PD_EPR_ENABLE && (!CY_PD_SOURCE_ONLY))
+bool typec_reset_epr[NO_OF_TYPEC_PORTS] = {false};
+#endif /* CY_PD_EPR_ENABLE && (!CY_PD_SOURCE_ONLY) */
+
 void app_event_handler(cy_stc_pdstack_context_t *ptrPdStackContext,
                cy_en_pdstack_app_evt_t evt, const void* dat)
 {
@@ -267,6 +288,9 @@ void app_event_handler(cy_stc_pdstack_context_t *ptrPdStackContext,
                 fault_handler_clear_counts (port);
             }
             gl_app_previous_polarity[port] = ptrPdStackContext->dpmConfig.polarity ;
+#if (CY_PD_EPR_ENABLE && (!CY_PD__SOURCE_ONLY))
+            typec_reset_epr[port] = false;
+#endif /* CY_PD_EPR_ENABLE && (!CY_PD__SOURCE_ONLY) */
             break;
 
         case APP_EVT_CONNECT:
@@ -347,6 +371,22 @@ void app_event_handler(cy_stc_pdstack_context_t *ptrPdStackContext,
             {
                 app_status[port].vdm_version = CY_PD_STD_VDM_VERSION_REV2;
             }
+#if (CY_PD_EPR_ENABLE && (!CY_PD_SOURCE_ONLY))
+            if(!typec_reset_epr[port])
+            {
+                /* Start a timer to attempt EPR entry. */
+                if ( (ptrPdStackContext->dpmConfig.curPortRole == CY_PD_PRT_ROLE_SINK) &&
+                        (ptrPdStackContext->dpmStat.srcCapP->dat[0].fixed_src.eprModeCapable == true) &&
+                        (ptrPdStackContext->dpmStat.epr.snkEnable == true))
+
+                {
+                    cy_sw_timer_start(ptrPdStackContext->ptrTimerContext, ptrPdStackContext,
+                            EPR_SNK_ENTRY_TIMER, EPR_SNK_ENTRY_TIMER_PERIOD, epr_enter_mode_timer_cb);
+
+                    typec_reset_epr[port] = true;
+                }
+            }
+#endif /* CY_PD_EPR_ENABLE && (!CY_PD_SOURCE_ONLY) */
             break;
 
 #if CY_PD_REV3_ENABLE
