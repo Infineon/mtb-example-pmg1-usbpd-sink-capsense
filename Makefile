@@ -7,13 +7,34 @@
 #
 ################################################################################
 # \copyright
-# $ Copyright 2021 Cypress Semiconductor Apache2 $
+# Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company)
+# SPDX-License-Identifier: Apache-2.0
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 ################################################################################
 
 
 ################################################################################
 # Basic Configuration
 ################################################################################
+
+#Type of ModusToolbox Makefile Options include:
+#
+#COMBINED    -- Top Level Makefile usually for single standalone application
+#APPLICATION -- Top Level Makefile usually for multi project application
+#PROJECT     -- Project Makefile under Application
+#
+MTB_TYPE=COMBINED
 
 # Target board/hardware (BSP).
 # To change the target, it is recommended to use the Library manager 
@@ -31,7 +52,7 @@ APPNAME=mtb-example-pmg1-usbpd-sink-capsense
 
 # Name of toolchain to use. Options include:
 #
-# GCC_ARM -- GCC 7.2.1, provided with ModusToolbox IDE
+# GCC_ARM -- GCC provided with ModusToolbox IDE
 # ARM     -- ARM Compiler (must be installed separately)
 # IAR     -- IAR Compiler (must be installed separately)
 #
@@ -43,8 +64,8 @@ TOOLCHAIN=GCC_ARM
 # Debug -- build with minimal optimizations, focus on debugging.
 # Release -- build with full optimizations
 # Custom -- build with custom configuration, set the optimization flag in CFLAGS
-# 
-# If CONFIG is manually edited, ensure to update or regenerate launch configurations 
+#
+# If CONFIG is manually edited, ensure to update or regenerate launch configurations
 # for your IDE.
 CONFIG=Debug
 
@@ -82,7 +103,7 @@ SOURCES=
 INCLUDES=
 
 # Add additional defines to the build process (without a leading -D).
-DEFINES=CY_PD_SINK_ONLY=1 CY_PD_REV3_ENABLE=1 VBUS_OVP_ENABLE=1 VBUS_UVP_ENABLE=0 SYS_DEEPSLEEP_ENABLE=1 CY_PD_EPR_ENABLE=1
+DEFINES=CY_PD_SINK_ONLY=1 CY_PD_REV3_ENABLE=1 VBUS_OVP_ENABLE=1 VBUS_UVP_ENABLE=0 SYS_DEEPSLEEP_ENABLE=1 CY_PD_EPR_ENABLE=1 BATTERY_CHARGING_ENABLE=1
 
 # Additional / custom C compiler flags.
 #
@@ -117,12 +138,6 @@ PREBUILD=
 # Custom post-build commands to run.
 POSTBUILD=
 
-# Variable set to "PMG1" to enable support for the PMG1 parts and BSPs.
-export CY_SUPPORTED_KITS=PMG1
-
-# Uncomment this to enable programming the board with MiniProg4 5V power supply
-#override CY_OPENOCD_ARGS=set ENABLE_POWER_SUPPLY 3300; $(CY_OPENOCD_INTERFACE); $(CY_OPENOCD_TARGET);
-
 
 ################################################################################
 # Paths
@@ -135,11 +150,11 @@ CY_APP_PATH=
 
 # Relative path to the shared repo location.
 #
-# All .mtb files have the format, <URI><COMMIT><LOCATION>. If the <LOCATION> field 
-# begins with $$ASSET_REPO$$, then the repo is deposited in the path specified by 
-# the CY_GETLIBS_SHARED_PATH variable. The default location is one directory level 
-# above the current app directory. This is used with the CY_GETLIBS_SHARED_NAME 
-# variable, which specifies the directory name.
+# All .mtb files have the format, <URI>#<COMMIT>#<LOCATION>. If the <LOCATION> field
+# begins with $$ASSET_REPO$$, then the repo is deposited in the path specified by
+# the CY_GETLIBS_SHARED_PATH variable. The default location is one directory level
+# above the current app directory.
+# This is used with CY_GETLIBS_SHARED_NAME variable, which specifies the directory name.
 CY_GETLIBS_SHARED_PATH=../
 
 # Directory name of the shared repo location.
@@ -163,7 +178,7 @@ CY_TOOLS_PATHS ?= $(wildcard \
 
 # If you install ModusToolbox IDE in a custom location, add the path to its
 # "tools_X.Y" folder (where X and Y are the version number of the tools
-# folder).
+# folder). Make sure you use forward slashes.
 CY_TOOLS_PATHS+=
 
 # Default to the newest installed tools folder, or the users override (if it's
@@ -171,7 +186,7 @@ CY_TOOLS_PATHS+=
 CY_TOOLS_DIR=$(lastword $(sort $(wildcard $(CY_TOOLS_PATHS))))
 
 ifeq ($(CY_TOOLS_DIR),)
-$(error Unable to find any of the available CY_TOOLS_PATHS -- $(CY_TOOLS_PATHS))
+$(error Unable to find any of the available CY_TOOLS_PATHS -- $(CY_TOOLS_PATHS). On Windows, use forward slashes.)
 endif
 
 $(info Tools Directory: $(CY_TOOLS_DIR))

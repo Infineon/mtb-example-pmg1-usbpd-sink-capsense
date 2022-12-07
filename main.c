@@ -8,7 +8,7 @@
 *
 *
 *******************************************************************************
-* Copyright 2021, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -41,11 +41,10 @@
 *******************************************************************************/
 
 #include "cy_pdl.h"
-#include "cyhal.h"
 #include "cybsp.h"
 #include "config.h"
 
-#include "cy_sw_timer.h"
+#include "cy_pdutils_sw_timer.h"
 #include "cy_usbpd_common.h"
 #include "cy_pdstack_common.h"
 #include "cy_usbpd_typec.h"
@@ -74,7 +73,7 @@ static uint8_t  gl_capsense_fast_scan_count = FAST_SCAN_COUNT;
 /* LED blink rate in milliseconds */
 static uint16_t gl_LedBlinkRate = LED_TIMER_PERIOD_DETACHED;
 
-cy_stc_sw_timer_t        gl_TimerCtx;
+cy_stc_pdutils_sw_timer_t        gl_TimerCtx;
 cy_stc_usbpd_context_t   gl_UsbPdPort0Ctx;
 
 cy_stc_pdstack_context_t gl_PdStackPort0Ctx;
@@ -85,7 +84,7 @@ cy_stc_pdstack_context_t gl_PdStackPort1Ctx;
 
 const cy_stc_pdstack_dpm_params_t pdstack_port0_dpm_params =
 {
-        .dpmSnkWaitCapPeriod = 350,
+        .dpmSnkWaitCapPeriod = 335,
         .dpmRpAudioAcc = CY_PD_RP_TERM_RP_CUR_DEF,
         .dpmDefCableCap = 300,
         .muxEnableDelayPeriod = 0,
@@ -96,7 +95,7 @@ const cy_stc_pdstack_dpm_params_t pdstack_port0_dpm_params =
 #if PMG1_PD_DUALPORT_ENABLE
 const cy_stc_pdstack_dpm_params_t pdstack_port1_dpm_params =
 {
-        .dpmSnkWaitCapPeriod = 350,
+        .dpmSnkWaitCapPeriod = 335,
         .dpmRpAudioAcc = CY_PD_RP_TERM_RP_CUR_DEF,
         .dpmDefCableCap = 300,
         .muxEnableDelayPeriod = 0,
@@ -184,13 +183,13 @@ static void wdt_interrupt_handler(void)
     /* Clear WDT pending interrupt */
     Cy_WDT_ClearInterrupt();
 
-#if (TIMER_TICKLESS_ENABLE == 0)
+#if (CY_PDUTILS_TIMER_TICKLESS_ENABLE == 0)
     /* Load the timer match register. */
-    Cy_WDT_SetMatch((Cy_WDT_GetCount() + gl_TimerCtx.gl_multiplier))
+    Cy_WDT_SetMatch((Cy_WDT_GetCount() + gl_TimerCtx.multiplier));
 #endif /* (TIMER_TICKLESS_ENABLE == 0) */
 
     /* Invoke the timer handler. */
-    cy_sw_timer_interrupt_handler (&(gl_TimerCtx));
+    Cy_PdUtils_SwTimer_InterruptHandler (&(gl_TimerCtx));
 }
 
 static void cy_usbpd0_intr0_handler(void)
@@ -221,10 +220,12 @@ void led_timer_cb (
         void *callbackContext)       /**< Timer module Context. */
 {
     cy_stc_pdstack_context_t *stack_ctx = (cy_stc_pdstack_context_t *)callbackContext;
+#if BATTERY_CHARGING_ENABLE
     const chgdet_status_t    *chgdet_stat;
+#endif /* #if BATTERY_CHARGING_ENABLE */
 
     /* Toggle the User LED and re-start timer to schedule the next toggle event. */
-    cyhal_gpio_toggle(CYBSP_USER_LED);
+    Cy_GPIO_Inv(CYBSP_USER_LED_PORT, CYBSP_USER_LED_PIN);
 
     /* Calculate the desired LED blink rate based on the correct Type-C connection state. */
     if (stack_ctx->dpmConfig.attach)
@@ -235,21 +236,20 @@ void led_timer_cb (
         }
         else
         {
+#if BATTERY_CHARGING_ENABLE
             chgdet_stat = chgdet_get_status(stack_ctx);
             if (chgdet_stat->chgdet_fsm_state == CHGDET_FSM_SINK_DCP_CONNECTED)
             {
                 gl_LedBlinkRate = LED_TIMER_PERIOD_DCP_SRC;
             }
-            else
+            else if (chgdet_stat->chgdet_fsm_state == CHGDET_FSM_SINK_CDP_CONNECTED)
             {
-                if (chgdet_stat->chgdet_fsm_state == CHGDET_FSM_SINK_CDP_CONNECTED)
-                {
-                    gl_LedBlinkRate = LED_TIMER_PERIOD_CDP_SRC;
-                }
-                else
-                {
-                    gl_LedBlinkRate = LED_TIMER_PERIOD_TYPEC_SRC;
-                }
+                gl_LedBlinkRate = LED_TIMER_PERIOD_CDP_SRC;
+            }
+            else
+#endif /* BATTERY_CHARGING_ENABLE */
+            {
+                gl_LedBlinkRate = LED_TIMER_PERIOD_TYPEC_SRC;
             }
         }
     }
@@ -258,7 +258,7 @@ void led_timer_cb (
         gl_LedBlinkRate = LED_TIMER_PERIOD_DETACHED;
     }
 
-    cy_sw_timer_start (&gl_TimerCtx, callbackContext, id, gl_LedBlinkRate, led_timer_cb);
+    Cy_PdUtils_SwTimer_Start (&gl_TimerCtx, callbackContext, id, gl_LedBlinkRate, led_timer_cb);
 }
 #endif /* APP_FW_LED_ENABLE */
 
@@ -359,7 +359,7 @@ void capsense_slow_timer_cb (
     scan_touch();
 
     /* Start the slow timer to initiate the next scan when the timer expires */
-    cy_sw_timer_start (&gl_TimerCtx, NULL, (cy_timer_id_t)CAPSENSE_SLOW_TIMER_ID,
+    Cy_PdUtils_SwTimer_Start (&gl_TimerCtx, NULL, (cy_timer_id_t)CAPSENSE_SLOW_TIMER_ID,
             (uint16_t)CAPSENSE_SLOW_SCAN_INTERVAL, capsense_slow_timer_cb);
 }
 
@@ -380,13 +380,13 @@ void capsense_fast_timer_cb (
     if(gl_capsense_fast_scan_count == 0u)
     {
         gl_capsense_fast_scan = false;
-        cy_sw_timer_start (&gl_TimerCtx, NULL, (cy_timer_id_t)CAPSENSE_SLOW_TIMER_ID,
+        Cy_PdUtils_SwTimer_Start (&gl_TimerCtx, NULL, (cy_timer_id_t)CAPSENSE_SLOW_TIMER_ID,
                 (uint16_t)CAPSENSE_SLOW_SCAN_INTERVAL, capsense_slow_timer_cb);
     }
     else
     {
         /* If the scan count is non-zero, keep the fast timer running */
-        cy_sw_timer_start (&gl_TimerCtx, NULL, (cy_timer_id_t)CAPSENSE_FAST_TIMER_ID,
+        Cy_PdUtils_SwTimer_Start (&gl_TimerCtx, NULL, (cy_timer_id_t)CAPSENSE_FAST_TIMER_ID,
                 (uint16_t)CAPSENSE_FAST_SCAN_INTERVAL, capsense_fast_timer_cb);
     }
 }
@@ -401,7 +401,7 @@ void capsense_fast_timer_cb (
 *******************************************************************************/
 static uint32_t initialize_capsense(void)
 {
-    uint32_t status = CYRET_SUCCESS;
+    uint32_t status = CY_CAPSENSE_STATUS_SUCCESS;
 
     /* CapSense interrupt configuration */
     const cy_stc_sysint_t CapSense_interrupt_config =
@@ -412,7 +412,7 @@ static uint32_t initialize_capsense(void)
 
     /* Capture the CSD HW block and initialize it to the default state. */
     status = Cy_CapSense_Init(&cy_capsense_context);
-    if (CYRET_SUCCESS != status)
+    if (CY_CAPSENSE_STATUS_SUCCESS != status)
     {
         return status;
     }
@@ -424,7 +424,7 @@ static uint32_t initialize_capsense(void)
 
     /* Initialize the CapSense firmware modules. */
     status = Cy_CapSense_Enable(&cy_capsense_context);
-    if (CYRET_SUCCESS != status)
+    if (CY_CAPSENSE_STATUS_SUCCESS != status)
     {
         return status;
     }
@@ -432,13 +432,13 @@ static uint32_t initialize_capsense(void)
     /* Assign a callback function to indicate end of CapSense scan. */
     status = Cy_CapSense_RegisterCallback(CY_CAPSENSE_END_OF_SCAN_E,
             capsense_callback, &cy_capsense_context);
-    if (CYRET_SUCCESS != status)
+    if (CY_CAPSENSE_STATUS_SUCCESS != status)
     {
         return status;
     }
 
     /* Start a timer that will initiate all the widget scan periodically. */
-    cy_sw_timer_start (&gl_TimerCtx, NULL, (cy_timer_id_t)CAPSENSE_SLOW_TIMER_ID,
+    Cy_PdUtils_SwTimer_Start (&gl_TimerCtx, NULL, (cy_timer_id_t)CAPSENSE_SLOW_TIMER_ID,
             (uint16_t)CAPSENSE_SLOW_SCAN_INTERVAL, capsense_slow_timer_cb);
 
     return status;
@@ -450,13 +450,13 @@ void enable_fast_timer(void)
     gl_capsense_fast_scan = true;
     gl_capsense_fast_scan_count = FAST_SCAN_COUNT;
     /* If the fast timer is not yet active, start the fast timer */
-    if(cy_sw_timer_is_running(&gl_TimerCtx, (cy_timer_id_t)CAPSENSE_FAST_TIMER_ID)==false)
+    if(Cy_PdUtils_SwTimer_IsRunning(&gl_TimerCtx, (cy_timer_id_t)CAPSENSE_FAST_TIMER_ID)==false)
     {
         /* Stop the slow timer */
-        cy_sw_timer_stop(&gl_TimerCtx, (cy_timer_id_t)CAPSENSE_SLOW_TIMER_ID);
+        Cy_PdUtils_SwTimer_Stop(&gl_TimerCtx, (cy_timer_id_t)CAPSENSE_SLOW_TIMER_ID);
 
         /* Start the fast timer */
-        cy_sw_timer_start(&gl_TimerCtx, NULL, (cy_timer_id_t)CAPSENSE_FAST_TIMER_ID,
+        Cy_PdUtils_SwTimer_Start(&gl_TimerCtx, NULL, (cy_timer_id_t)CAPSENSE_FAST_TIMER_ID,
                 (uint16_t)CAPSENSE_FAST_SCAN_INTERVAL, capsense_fast_timer_cb);
     }
 }
@@ -554,6 +554,7 @@ static void process_touch(void)
 int main(void)
 {
     cy_rslt_t result;
+    cy_stc_pdutils_timer_config_t timerConfig;
 
     /* Initialize the device and board peripherals */
     result = cybsp_init() ;
@@ -569,8 +570,11 @@ int main(void)
     Cy_SysInt_Init(&wdt_interrupt_config, &wdt_interrupt_handler);
     NVIC_EnableIRQ(wdt_interrupt_config.intrSrc);
 
+    timerConfig.sys_clk_freq = Cy_SysClk_ClkSysGetFrequency();
+    timerConfig.hw_timer_ctx = NULL;
+
     /* Initialize the soft timer module. */
-    cy_sw_timer_init(&gl_TimerCtx, Cy_SysClk_ClkSysGetFrequency());
+    Cy_PdUtils_SwTimer_Init(&gl_TimerCtx, &timerConfig);
 
     /* Enable global interrupts */
     __enable_irq();
@@ -578,7 +582,7 @@ int main(void)
     /* Initialize Capsense */
     result = initialize_capsense();
 
-    if (CYRET_SUCCESS != result)
+    if (CY_CAPSENSE_STATUS_SUCCESS != result)
     {
         /* Halt the CPU if CapSense initialization failed */
         CY_ASSERT(0);
@@ -658,18 +662,16 @@ int main(void)
 #endif /* PMG1_PD_DUALPORT_ENABLE */
 
 #if APP_FW_LED_ENABLE
-    /* Configure LED pin as a strong drive output */
-    cyhal_gpio_init(CYBSP_USER_LED, CYHAL_GPIO_DIR_OUTPUT, CYHAL_GPIO_DRIVE_STRONG, false);
-
     /* Start a timer that will blink the FW ACTIVE LED. */
-    cy_sw_timer_start (&gl_TimerCtx, (void *)&gl_PdStackPort0Ctx, (cy_timer_id_t)LED_TIMER_ID,
+    Cy_PdUtils_SwTimer_Start (&gl_TimerCtx, (void *)&gl_PdStackPort0Ctx, (cy_timer_id_t)LED_TIMER_ID,
             gl_LedBlinkRate, led_timer_cb);
 #endif /* APP_FW_LED_ENABLE */
 
     /*
-     * After the initialization is complete, keep processing the USB-PD device policy manager task in a loop.
-     * Since this application does not have any other function, the PMG1 device can be placed in "deep sleep"
-     * mode for power saving whenever the PD stack and drivers are idle.
+     * After the initialization is complete, keep processing the USB-PD device
+     * policy manager task in a loop.  Since this application does not have any
+     * other function, the PMG1 device can be placed in "deep sleep" mode for
+     * power saving whenever the PD stack and drivers are idle.
      */
     for (;;)
     {
