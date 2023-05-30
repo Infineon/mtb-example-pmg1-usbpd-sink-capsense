@@ -8,7 +8,7 @@
 *
 *
 *******************************************************************************
-* Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2021-2023, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -39,7 +39,7 @@
 * of such system or application assumes all risk of such use and in doing
 * so agrees to indemnify Cypress against all liability.
 *******************************************************************************/
-
+    
 #include "cy_pdl.h"
 #include "cybsp.h"
 #include "config.h"
@@ -232,7 +232,36 @@ void led_timer_cb (
     {
         if (stack_ctx->dpmConfig.contractExist)
         {
-            gl_LedBlinkRate = LED_TIMER_PERIOD_PD_SRC;
+            if(stack_ctx ->dpmStat.contract.minVolt == CY_PD_VSAFE_5V)
+            {
+                /* Toggle the LED 5 times in 10 seconds for a 5V USBPD Contract */
+                gl_LedBlinkRate = LED_TIMER_PERIOD_PD_SRC / 5;
+            }
+            else if(stack_ctx ->dpmStat.contract.minVolt == CY_PD_VSAFE_9V)
+            {
+                /* Toggle the LED 9 times in 10 seconds for a 9V USBPD Contract */
+                gl_LedBlinkRate = LED_TIMER_PERIOD_PD_SRC / 9;
+            }
+            else if(stack_ctx ->dpmStat.contract.minVolt == CY_PD_VSAFE_12V)
+            {
+                /* Toggle the LED 12 times in 10 seconds for a 12V USBPD Contract */
+                gl_LedBlinkRate = LED_TIMER_PERIOD_PD_SRC / 12;
+            }
+            else if(stack_ctx ->dpmStat.contract.minVolt == CY_PD_VSAFE_15V)
+            {
+                /* Toggle the LED 15 times in 10 seconds for a 15V USBPD Contract */
+                gl_LedBlinkRate = LED_TIMER_PERIOD_PD_SRC / 15;
+            }
+            else if(stack_ctx ->dpmStat.contract.minVolt == CY_PD_VSAFE_20V)
+            {
+                /* Toggle the LED 20 times in 10 seconds for a 20V USBPD Contract */
+                gl_LedBlinkRate = LED_TIMER_PERIOD_PD_SRC / 20;
+            }
+            else  if(stack_ctx ->dpmStat.contract.minVolt > CY_PD_VSAFE_20V)
+            {
+                /* Toggle the LED 28 times in 10 seconds for a EPR USBPD Contract */
+                gl_LedBlinkRate = LED_TIMER_PERIOD_PD_SRC / 28;
+            }
         }
         else
         {
@@ -468,6 +497,12 @@ void enable_fast_timer(void)
 *  and updates the LED status.
 *
 *******************************************************************************/
+#if (CY_PD_EPR_ENABLE)
+bool gl_epr_exit = false;
+#endif /* CY_PD_EPR_ENABLE */
+uint8_t curr_snk_pdo_mask = 0x1F;
+uint8_t get_src_data_buffer[2];
+
 static void process_touch(void)
 {
     uint8_t touchDetected = 0u;
@@ -475,18 +510,25 @@ static void process_touch(void)
     uint32_t button1_status;
     cy_stc_capsense_touch_t *ptrSliderPosition;
     uint32_t position = 0u;
+    uint8_t temp_sink_pdo_mask = 0u;
+    cy_stc_pdstack_context_t *ptrPdStackContext = &gl_PdStackPort0Ctx;
+    cy_stc_pdstack_dpm_ext_status_t *dpmExt = &(ptrPdStackContext->dpmExtStat);
+    bool sendGetEPRSrcCap = false;
 
     /* Get button 0 status */
     button0_status = Cy_CapSense_IsSensorActive(
         CY_CAPSENSE_BUTTON0_WDGT_ID,
         CY_CAPSENSE_BUTTON0_SNS0_ID,
         &cy_capsense_context);
-    if(button0_status!=0u)
+    if(button0_status != 0u)
     {
         /* Switch ON the LED when touch is detected */
         Cy_GPIO_Write(CYBSP_LED_BTN0_PORT, CYBSP_LED_BTN0_PIN, LED_ON);
         /* Set the flag to indicate touch was detected */
         touchDetected = 1u;
+        /* Set the Sink PDO mask to enable 5V Fixed PDO & 7V-21V Variable PDO */
+        temp_sink_pdo_mask = 0x11u;
+        sendGetEPRSrcCap = true;
     }
     else
     {
@@ -499,12 +541,24 @@ static void process_touch(void)
         CY_CAPSENSE_BUTTON1_WDGT_ID,
         CY_CAPSENSE_BUTTON1_SNS0_ID,
         &cy_capsense_context);
-    if(button1_status!=0u)
+    if(button1_status != 0u)
     {
         /* Switch ON the LED when touch is detected */
         Cy_GPIO_Write(CYBSP_LED_BTN1_PORT, CYBSP_LED_BTN1_PIN, LED_ON);
         /* Set the flag to indicate touch was detected */
         touchDetected = 1u;
+
+#if (CY_PD_EPR_ENABLE)
+        if ( (false == dpmExt->eprActive) &&
+                     (ptrPdStackContext->dpmStat.srcCapP->dat[0].fixed_src.eprModeCapable == true) &&
+                                    (ptrPdStackContext->dpmExtStat.epr.snkEnable == true))
+         {
+
+             Cy_PdStack_Dpm_SendPdCommand(ptrPdStackContext, CY_PDSTACK_DPM_CMD_SNK_EPR_MODE_ENTRY, NULL, false, NULL);
+
+         }
+#endif /* CY_PD_EPR_ENABLE */
+
     }
     else
     {
@@ -531,6 +585,52 @@ static void process_touch(void)
 
         /* Set the flag to indicate touch was detected */
         touchDetected = 1u;
+
+        if(position <= ( 1 * STEP_SIZE))
+        {
+            /* Set the Sink PDO mask to enable only 5V Fixed PDO */
+            temp_sink_pdo_mask = 0x01u;
+        }
+        else if( (position > ( 1 * STEP_SIZE)) && (position <= ( 2 * STEP_SIZE)))
+        {
+            /* Set the Sink PDO mask to enable 5V Fixed PDO & 7V-10V Variable PDO */
+            temp_sink_pdo_mask = 0x03u;
+        }
+        else if( (position > ( 2 * STEP_SIZE)) && (position <= (3 * STEP_SIZE)))
+        {
+            /* Set the Sink PDO mask to enable 5V Fixed PDO & 7V-13V Variable PDO */
+            temp_sink_pdo_mask = 0x05u;
+        }
+        else if( (position > ( 3 * STEP_SIZE)) && (position <= ( 4 * STEP_SIZE)))
+        {
+            /* Set the Sink PDO mask to enable 5V Fixed PDO & 7V-16V Variable PDO */
+            temp_sink_pdo_mask = 0x09u;
+        }
+        else if( (position > ( 4 * STEP_SIZE)) && (position <= ( 5 * STEP_SIZE)))
+        {
+            /* Set the Sink PDO mask to enable 5V Fixed PDO & 7V-21V Variable PDO */
+            temp_sink_pdo_mask = 0x11u;
+        }
+
+        if(false == dpmExt->eprActive)
+        {
+            if(curr_snk_pdo_mask != temp_sink_pdo_mask)
+            {
+                Cy_PdStack_Dpm_UpdateSnkCapMask (ptrPdStackContext, temp_sink_pdo_mask);
+
+                if(CY_PDSTACK_STAT_SUCCESS == Cy_PdStack_Dpm_SendPdCommand(ptrPdStackContext, CY_PDSTACK_DPM_CMD_SNK_CAP_CHNG,
+                                                                 NULL, false, NULL))
+                {
+                    curr_snk_pdo_mask = temp_sink_pdo_mask;
+                }
+            }
+        }
+#if (CY_PD_EPR_ENABLE)
+        else
+        {
+            sendGetEPRSrcCap = true;
+        }
+#endif /* CY_PD_EPR_ENABLE */
     }
     else
     {
@@ -540,6 +640,30 @@ static void process_touch(void)
         Cy_GPIO_Write(CYBSP_LED_SLD3_PORT, CYBSP_LED_SLD3_PIN, LED_OFF);
         Cy_GPIO_Write(CYBSP_LED_SLD4_PORT, CYBSP_LED_SLD4_PIN, LED_OFF);
     }
+
+#if (CY_PD_EPR_ENABLE)
+    if((true == dpmExt->eprActive) && (gl_epr_exit != true) && (sendGetEPRSrcCap))
+     {
+        sendGetEPRSrcCap = false;
+        Cy_PdStack_Dpm_UpdateSnkCapMask (ptrPdStackContext, temp_sink_pdo_mask);
+        curr_snk_pdo_mask = temp_sink_pdo_mask;
+
+        cy_stc_pdstack_dpm_pd_cmd_buf_t extd_dpm_buf;
+        get_src_data_buffer[0] = CY_PDSTACK_EPR_GET_SRC_CAP;
+        get_src_data_buffer[1] = 0x0u;
+        extd_dpm_buf.cmdSop = CY_PD_SOP;
+        extd_dpm_buf.extdType = CY_PDSTACK_EXTD_MSG_EXTD_CTRL_MSG;
+        extd_dpm_buf.extdHdr.extd.dataSize = 0x02u;
+        extd_dpm_buf.extdHdr.extd.chunked = !(ptrPdStackContext->dpmStat.unchunkSupLive);
+        extd_dpm_buf.datPtr = (uint8_t*)&get_src_data_buffer[0];
+        extd_dpm_buf.cmdDo[0].val = CY_PDSTACK_EPR_GET_SRC_CAP;
+
+        if(CY_PDSTACK_STAT_SUCCESS == Cy_PdStack_Dpm_SendPdCommand(ptrPdStackContext, CY_PDSTACK_DPM_CMD_SEND_EXTENDED, &extd_dpm_buf, false, NULL))
+        {
+            gl_epr_exit = true;
+        }
+     }
+#endif /* CY_PD_EPR_ENABLE */
 
     if(touchDetected == 1u)
     {

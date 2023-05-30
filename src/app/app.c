@@ -8,7 +8,7 @@
 * Related Document: See README.md
 *
 *******************************************************************************
-* Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2021-2023, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -249,6 +249,30 @@ void epr_enter_mode_timer_cb (
                 GET_APP_TIMER_ID(ptrPdStackContext, APP_EPR_MODE_TIMER), EPR_SNK_ENTRY_TIMER_PERIOD, epr_enter_mode_timer_cb);
     }
 }
+
+extern bool gl_epr_exit;
+extern bool gl_epr_entry;
+
+void epr_mode_exit_cb (
+        cy_timer_id_t id,
+        void *ptrContext)
+{
+
+    (void)id;
+    cy_stc_pdstack_context_t *ptrPdStackContext = (cy_stc_pdstack_context_t *)ptrContext;
+
+    cy_stc_pdstack_dpm_pd_cmd_buf_t cmdBuf;
+    cmdBuf.noOfCmdDo = 1u;
+    cmdBuf.cmdDo[0].eprmdo.action = CY_PDSTACK_EPR_MODE_EXIT;
+    cmdBuf.cmdDo[0].eprmdo.data = 0u;
+    cmdBuf.cmdDo[0].eprmdo.rsvd =  0u;
+
+    if( Cy_PdStack_Dpm_SendPdCommand(ptrPdStackContext, CY_PDSTACK_DPM_CMD_SEND_EPR_MODE, &cmdBuf, false, NULL) == CY_PDSTACK_STAT_SUCCESS )
+    {
+        gl_epr_exit = false;
+    }
+
+}
 #endif /* CY_PD_EPR_ENABLE && (!CY_PD_SOURCE_ONLY */
 
 #if (CY_PD_EPR_ENABLE && (!CY_PD_SOURCE_ONLY))
@@ -359,20 +383,25 @@ void app_event_handler(cy_stc_pdstack_context_t *ptrPdStackContext,
             }
             break;
 
+        case APP_EVT_EPR_MODE_ENTER_SUCCESS:
+            break;
+
         case APP_EVT_PD_CONTRACT_NEGOTIATION_COMPLETE:
             /* Set VDM version based on active PD revision. */
 #if CY_PD_REV3_ENABLE
             if (ptrPdStackContext->dpmConfig.specRevSopLive >= CY_PD_REV3)
             {
                 app_status[port].vdm_version = CY_PD_STD_VDM_VERSION_REV3;
+                app_status[port].vdm_minor_version = CY_PDSTACK_STD_VDM_MINOR_VER1;
             }
             else
 #endif /* CY_PD_REV3_ENABLE */
             {
                 app_status[port].vdm_version = CY_PD_STD_VDM_VERSION_REV2;
+                app_status[port].vdm_minor_version = CY_PDSTACK_STD_VDM_MINOR_VER0;
             }
 #if (CY_PD_EPR_ENABLE && (!CY_PD_SOURCE_ONLY))
-            if(!typec_reset_epr[port])
+            if((!typec_reset_epr[port]) && (false == gl_epr_exit))
             {
                 /* Start a timer to attempt EPR entry. */
                 if ( (ptrPdStackContext->dpmConfig.curPortRole == CY_PD_PRT_ROLE_SINK) &&
@@ -385,6 +414,11 @@ void app_event_handler(cy_stc_pdstack_context_t *ptrPdStackContext,
 
                     typec_reset_epr[port] = true;
                 }
+            }
+            else if(false != gl_epr_exit)
+            {
+                Cy_PdUtils_SwTimer_Start(ptrPdStackContext->ptrTimerContext, ptrPdStackContext,(cy_timer_id_t) EPR_MODE_EXIT_TIMER,
+                        (uint16_t)EPR_MODE_EXIT_TIMER_PERIOD, epr_mode_exit_cb);
             }
 #endif /* CY_PD_EPR_ENABLE && (!CY_PD_SOURCE_ONLY) */
             break;

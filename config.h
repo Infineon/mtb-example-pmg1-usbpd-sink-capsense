@@ -7,7 +7,7 @@
 * Related Document: See README.md
 *
 *******************************************************************************
-* Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2021-2023, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -143,22 +143,22 @@
 /*
  * The LED toggle period (ms) to be used when Type-C connection hasn't been detected.
  */
-#define LED_TIMER_PERIOD_DETACHED               (1000u)
+#define LED_TIMER_PERIOD_DETACHED               (4000u)
 
 /*
  * The LED toggle period (ms) to be used when a Type-C power source is connected.
  */
-#define LED_TIMER_PERIOD_TYPEC_SRC              (500u)
+#define LED_TIMER_PERIOD_TYPEC_SRC              (5000u)
 
 /*
  * The LED toggle period (ms) to be used when a USB-PD power source is connected.
  */
-#define LED_TIMER_PERIOD_PD_SRC                 (100u)
+#define LED_TIMER_PERIOD_PD_SRC                 (10000u)
 
 /*
  * The LED toggle period (ms) to be used when a BC 1.2 DCP (Downstream Charging Port) source without PD support is connected.
  */
-#define LED_TIMER_PERIOD_DCP_SRC                (3000u)
+#define LED_TIMER_PERIOD_DCP_SRC                (7500u)
 
 /*
  * The LED toggle period (ms) to be used when a BC 1.2 CDP (Charging Downstream Port) source without PD support is connected.
@@ -177,11 +177,14 @@
 
 #define EPR_SNK_ENTRY_TIMER_PERIOD              (100u)
 
+#define EPR_MODE_EXIT_TIMER                     (CY_PDUTILS_TIMER_USER_START_ID + 3u)
+#define EPR_MODE_EXIT_TIMER_PERIOD              (100u)
+
 /*
  * Time interval(ms) for the Capsense widget scan.
  */
 #define CAPSENSE_FAST_SCAN_INTERVAL             (100u)
-#define CAPSENSE_SLOW_SCAN_INTERVAL             (250u)
+#define CAPSENSE_SLOW_SCAN_INTERVAL             (150u)
 
 /*
  * The timer is used to initiate Capsense scan on all widgets periodically.

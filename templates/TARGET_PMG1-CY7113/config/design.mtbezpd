@@ -60,6 +60,48 @@
                         <Param id="min_max_cur" value="900"/>
                     </ParameterGroup>
                     <ParameterGroup id="sink_pdo">
+                        <Param id="enable" value="false"/>
+                        <Param id="sink_pdo_type" value="0x02"/>
+                        <Param id="volt" value="12000"/>
+                        <Param id="max_volt" value="10000"/>
+                        <Param id="max_volt_pps" value="5000"/>
+                        <Param id="min_volt" value="7000"/>
+                        <Param id="min_volt_pps" value="5000"/>
+                        <Param id="op_cur" value="700"/>
+                        <Param id="op_cur_pps" value="900"/>
+                        <Param id="op_power" value="4500"/>
+                        <Param id="sink_give_back" value="false"/>
+                        <Param id="min_max_cur" value="900"/>
+                    </ParameterGroup>
+                    <ParameterGroup id="sink_pdo">
+                        <Param id="enable" value="false"/>
+                        <Param id="sink_pdo_type" value="0x02"/>
+                        <Param id="volt" value="9000"/>
+                        <Param id="max_volt" value="13000"/>
+                        <Param id="max_volt_pps" value="5000"/>
+                        <Param id="min_volt" value="7000"/>
+                        <Param id="min_volt_pps" value="5000"/>
+                        <Param id="op_cur" value="900"/>
+                        <Param id="op_cur_pps" value="900"/>
+                        <Param id="op_power" value="4500"/>
+                        <Param id="sink_give_back" value="false"/>
+                        <Param id="min_max_cur" value="900"/>
+                    </ParameterGroup>
+                    <ParameterGroup id="sink_pdo">
+                        <Param id="enable" value="false"/>
+                        <Param id="sink_pdo_type" value="0x02"/>
+                        <Param id="volt" value="20000"/>
+                        <Param id="max_volt" value="16000"/>
+                        <Param id="max_volt_pps" value="5000"/>
+                        <Param id="min_volt" value="7000"/>
+                        <Param id="min_volt_pps" value="5000"/>
+                        <Param id="op_cur" value="900"/>
+                        <Param id="op_cur_pps" value="900"/>
+                        <Param id="op_power" value="4500"/>
+                        <Param id="sink_give_back" value="false"/>
+                        <Param id="min_max_cur" value="900"/>
+                    </ParameterGroup>
+                    <ParameterGroup id="sink_pdo">
                         <Param id="enable" value="true"/>
                         <Param id="sink_pdo_type" value="0x02"/>
                         <Param id="volt" value="7000"/>

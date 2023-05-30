@@ -7,7 +7,7 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company)
+# Copyright 2021-2023, Cypress Semiconductor Corporation (an Infineon company)
 # SPDX-License-Identifier: Apache-2.0
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -103,7 +103,8 @@ SOURCES=
 INCLUDES=
 
 # Add additional defines to the build process (without a leading -D).
-DEFINES=CY_PD_SINK_ONLY=1 CY_PD_REV3_ENABLE=1 VBUS_OVP_ENABLE=1 VBUS_UVP_ENABLE=0 SYS_DEEPSLEEP_ENABLE=1 CY_PD_EPR_ENABLE=1 BATTERY_CHARGING_ENABLE=1
+DEFINES=CY_PD_SINK_ONLY=1 CY_PD_REV3_ENABLE=1 VBUS_OVP_ENABLE=1 VBUS_UVP_ENABLE=0 \
+SYS_DEEPSLEEP_ENABLE=1 CY_PD_EPR_ENABLE=1 BATTERY_CHARGING_ENABLE=1 CY_PD_EPR_AVS_ENABLE=1
 
 # Additional / custom C compiler flags.
 #
