@@ -694,6 +694,7 @@ int main(void)
     Cy_SysInt_Init(&wdt_interrupt_config, &wdt_interrupt_handler);
     NVIC_EnableIRQ(wdt_interrupt_config.intrSrc);
 
+    /* Initialize the timerconfig with sysclk. */
     timerConfig.sys_clk_freq = Cy_SysClk_ClkSysGetFrequency();
     timerConfig.hw_timer_ctx = NULL;
 
